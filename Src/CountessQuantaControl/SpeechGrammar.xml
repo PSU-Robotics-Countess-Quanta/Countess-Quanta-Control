@@ -1,0 +1,50 @@
+﻿<grammar version="1.0" xml:lang="en-US" root="rootRule" tag-format="semantics/1.0-literals" xmlns="http://www.w3.org/2001/06/grammar">
+  <rule id="rootRule">
+    <one-of>
+      <item>
+        <tag>Hello</tag>
+        <one-of>
+          <item> hello </item>
+          <item> hi </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>PlayHarp</tag>
+        <one-of>
+          <item> Could you play some music on harp </item>
+          <item> Would you like play some music on harp </item>
+          <item> Can you play some music on harp </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>Count</tag>
+        <one-of>
+          <item> what's one plus two </item>
+          <item> what's one and two </item>
+          <item> one plus two </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>NAME</tag>
+        <one-of>
+          <item> what's your name </item>
+          <item> who are you </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>DEFAULT</tag>
+        <one-of>
+          <item>  </item>
+          <item>  </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>PLAYMUSIC</tag>
+        <one-of>
+          <item> Could you play some music by hand</item>
+          <item>  Would you like play some music by hand</item>
+        </one-of>
+      </item>
+    </one-of>
+  </rule>
+</grammar>
