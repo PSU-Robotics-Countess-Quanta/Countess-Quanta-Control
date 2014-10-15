@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfServo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Servo>
+    <index>0</index>
+    <name>Wrist left/right</name>
+    <positionLimitMin>700</positionLimitMin>
+    <positionLimitMax>2300</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>1400</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+  <Servo>
+    <index>1</index>
+    <name>Wrist rotation</name>
+    <positionLimitMin>800</positionLimitMin>
+    <positionLimitMax>2400</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>1350</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+  <Servo>
+    <index>2</index>
+    <name>Wrist Up/down</name>
+    <positionLimitMin>700</positionLimitMin>
+    <positionLimitMax>2100</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>750</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+  <Servo>
+    <index>3</index>
+    <name>Arm Up/down</name>
+    <positionLimitMin>700</positionLimitMin>
+    <positionLimitMax>2650</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>1400</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+  <Servo>
+    <index>5</index>
+    <name>Arm rotation</name>
+    <positionLimitMin>550</positionLimitMin>
+    <positionLimitMax>2400</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>1500</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+  <Servo>
+    <index>6</index>
+    <name>Shoulder left/right</name>
+    <positionLimitMin>300</positionLimitMin>
+    <positionLimitMax>2250</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>1000</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+  <Servo>
+    <index>8</index>
+    <name>Eyes left/right</name>
+    <positionLimitMin>1000</positionLimitMin>
+    <positionLimitMax>2000</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>1600</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+  <Servo>
+    <index>9</index>
+    <name>Head up/down</name>
+    <positionLimitMin>1000</positionLimitMin>
+    <positionLimitMax>2000</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>1500</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+  <Servo>
+    <index>10</index>
+    <name>Head left/right</name>
+    <positionLimitMin>1350</positionLimitMin>
+    <positionLimitMax>1750</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>1550</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+  <Servo>
+    <index>11</index>
+    <name>Mouth open/close</name>
+    <positionLimitMin>1000</positionLimitMin>
+    <positionLimitMax>1350</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>1000</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+  <Servo>
+    <index>12</index>
+    <name>Ring finger</name>
+    <positionLimitMin>1350</positionLimitMin>
+    <positionLimitMax>2000</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>1600</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+  <Servo>
+    <index>13</index>
+    <name>Middle finger</name>
+    <positionLimitMin>1250</positionLimitMin>
+    <positionLimitMax>1800</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>1500</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+  <Servo>
+    <index>14</index>
+    <name>Pinky finger</name>
+    <positionLimitMin>1200</positionLimitMin>
+    <positionLimitMax>1750</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>1400</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+  <Servo>
+    <index>15</index>
+    <name>Left arm</name>
+    <positionLimitMin>1250</positionLimitMin>
+    <positionLimitMax>1600</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>1400</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+  <Servo>
+    <index>16</index>
+    <name>Thumb</name>
+    <positionLimitMin>1500</positionLimitMin>
+    <positionLimitMax>1700</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>1600</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+  <Servo>
+    <index>17</index>
+    <name>Index finger</name>
+    <positionLimitMin>1000</positionLimitMin>
+    <positionLimitMax>1500</positionLimitMax>
+    <speedLimitMin>10</speedLimitMin>
+    <speedLimitMax>1000</speedLimitMax>
+    <defaultPosition>1250</defaultPosition>
+    <defaultSpeed>20</defaultSpeed>
+    <defaultAcceleration>0</defaultAcceleration>
+  </Servo>
+</ArrayOfServo>
