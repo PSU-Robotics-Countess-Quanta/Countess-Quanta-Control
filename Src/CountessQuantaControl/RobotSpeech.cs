@@ -28,8 +28,8 @@ namespace CountessQuantaControl
             this.servoManager = servoManager;
             mouthServoIndex = servoManager.GetServoIndex("Mouth open/close");
 
-            speechSynthesizer.SelectVoice("Microsoft Anna");
-            speechSynthesizer.Rate = -3;
+            speechSynthesizer.SelectVoice(speechSynthesizer.GetInstalledVoices().Where(i=>i.Enabled && i.VoiceInfo.Gender == VoiceGender.Female).First().VoiceInfo.Name);
+            speechSynthesizer.Rate = 0;
 
             Thread speechAnimationThread = new Thread(new ThreadStart(SpeechAnimationThread));
             speechAnimationThread.IsBackground = true;

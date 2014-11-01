@@ -201,8 +201,8 @@ namespace CountessQuantaControl
         private void TestSpeech_Click(object sender, RoutedEventArgs e)
         {
             //System.Collections.ObjectModel.ReadOnlyCollection<InstalledVoice> voices = speechSynthesizer.GetInstalledVoices();
-            speechSynthesizer.SelectVoice("Microsoft Anna");
-            speechSynthesizer.Rate = -3;
+            speechSynthesizer.SelectVoice(speechSynthesizer.GetInstalledVoices().Where(i=>i.Enabled && i.VoiceInfo.Gender == VoiceGender.Female).First().VoiceInfo.Name);
+            speechSynthesizer.Rate = 0;
             speechSynthesizer.SpeakAsyncCancelAll();
             speechSynthesizer.SpeakAsync(textToSpeechTextBox.Text);
         }
