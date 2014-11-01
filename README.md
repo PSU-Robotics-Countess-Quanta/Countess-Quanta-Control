@@ -162,6 +162,5 @@ If simpleConnect is able to communicate with the Pioneer 2, then CountessQuantaC
 
 <li>This should connect to the Kinect hardware and display a black window. Stand in front of the Kinect to appear on the display as a skeleton visualization. This skeleton functionality is used in the CountessQuantaControl software for person tracking and gesture recognition.</li>
 
-<li></li>
 <ol>
 
