@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -52,12 +53,13 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="UsbWrapper">
-      <HintPath>.\UsbWrapper.dll</HintPath>
+    <Reference Include="UsbWrapper, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\UsbWrapper.dll</HintPath>
     </Reference>
     <Reference Include="Usc, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Usc.dll</HintPath>
+      <HintPath>bin\Debug\Usc.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -68,7 +70,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AriaManager.cs" />
     <Compile Include="ErrorLogging.cs" />
+    <Compile Include="PersonTracking.cs" />
+    <Compile Include="RobotEyes.cs" />
+    <Compile Include="RobotSpeech.cs" />
     <Compile Include="SequenceClasses.cs" />
     <Compile Include="SequenceProcessor.cs" />
     <Compile Include="ServoManager.cs" />
@@ -84,16 +90,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="KinectManager.cs" />
-    <Compile Include="RobotDisplay.xaml.cs">
-      <DependentUpon>RobotDisplay.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ControlWindow.xaml.cs">
       <DependentUpon>ControlWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="RobotDisplay.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="SkeletonViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -116,6 +115,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

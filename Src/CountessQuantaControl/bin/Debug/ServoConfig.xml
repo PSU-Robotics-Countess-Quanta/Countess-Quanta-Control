@@ -26,7 +26,7 @@
     <index>2</index>
     <name>Wrist Up/down</name>
     <positionLimitMin>700</positionLimitMin>
-    <positionLimitMax>2100</positionLimitMax>
+    <positionLimitMax>2400</positionLimitMax>
     <speedLimitMin>10</speedLimitMin>
     <speedLimitMax>1000</speedLimitMax>
     <defaultPosition>750</defaultPosition>
@@ -58,11 +58,11 @@
   <Servo>
     <index>6</index>
     <name>Shoulder left/right</name>
-    <positionLimitMin>300</positionLimitMin>
-    <positionLimitMax>2250</positionLimitMax>
+    <positionLimitMin>1600</positionLimitMin>
+    <positionLimitMax>2350</positionLimitMax>
     <speedLimitMin>10</speedLimitMin>
     <speedLimitMax>1000</speedLimitMax>
-    <defaultPosition>1000</defaultPosition>
+    <defaultPosition>2300</defaultPosition>
     <defaultSpeed>20</defaultSpeed>
     <defaultAcceleration>0</defaultAcceleration>
   </Servo>
@@ -80,11 +80,11 @@
   <Servo>
     <index>9</index>
     <name>Head up/down</name>
-    <positionLimitMin>1000</positionLimitMin>
-    <positionLimitMax>2000</positionLimitMax>
+    <positionLimitMin>1600</positionLimitMin>
+    <positionLimitMax>2350</positionLimitMax>
     <speedLimitMin>10</speedLimitMin>
     <speedLimitMax>1000</speedLimitMax>
-    <defaultPosition>1500</defaultPosition>
+    <defaultPosition>2000</defaultPosition>
     <defaultSpeed>20</defaultSpeed>
     <defaultAcceleration>0</defaultAcceleration>
   </Servo>
@@ -102,19 +102,19 @@
   <Servo>
     <index>11</index>
     <name>Mouth open/close</name>
-    <positionLimitMin>1000</positionLimitMin>
-    <positionLimitMax>1350</positionLimitMax>
+    <positionLimitMin>600</positionLimitMin>
+    <positionLimitMax>1200</positionLimitMax>
     <speedLimitMin>10</speedLimitMin>
     <speedLimitMax>1000</speedLimitMax>
-    <defaultPosition>1000</defaultPosition>
+    <defaultPosition>800</defaultPosition>
     <defaultSpeed>20</defaultSpeed>
     <defaultAcceleration>0</defaultAcceleration>
   </Servo>
   <Servo>
     <index>12</index>
     <name>Ring finger</name>
-    <positionLimitMin>1350</positionLimitMin>
-    <positionLimitMax>2000</positionLimitMax>
+    <positionLimitMin>1200</positionLimitMin>
+    <positionLimitMax>2200</positionLimitMax>
     <speedLimitMin>10</speedLimitMin>
     <speedLimitMax>1000</speedLimitMax>
     <defaultPosition>1600</defaultPosition>
@@ -125,7 +125,7 @@
     <index>13</index>
     <name>Middle finger</name>
     <positionLimitMin>1250</positionLimitMin>
-    <positionLimitMax>1800</positionLimitMax>
+    <positionLimitMax>1900</positionLimitMax>
     <speedLimitMin>10</speedLimitMin>
     <speedLimitMax>1000</speedLimitMax>
     <defaultPosition>1500</defaultPosition>
@@ -168,8 +168,8 @@
   <Servo>
     <index>17</index>
     <name>Index finger</name>
-    <positionLimitMin>1000</positionLimitMin>
-    <positionLimitMax>1500</positionLimitMax>
+    <positionLimitMin>1550</positionLimitMin>
+    <positionLimitMax>2100</positionLimitMax>
     <speedLimitMin>10</speedLimitMin>
     <speedLimitMax>1000</speedLimitMax>
     <defaultPosition>1250</defaultPosition>
