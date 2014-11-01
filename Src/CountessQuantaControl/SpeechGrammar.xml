@@ -9,6 +9,39 @@
         </one-of>
       </item>
       <item>
+        <tag>HowAreUDoing</tag>
+        <one-of>
+          <item> how are you doing </item>
+          <item> how are you </item>
+          <item> how is going on </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>Thanks</tag>
+        <one-of>
+          <item> That's ok </item>
+          <item> That's fine </item>
+          <item> That's cool </item>
+          <item> it's so cool </item>
+          <item> it's cool </item>
+          <item> it's nice </item>
+          <item> it's pretty cool </item>
+          <item> you are smart </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>Introduce</tag>
+        <one-of>
+          <item> Can you introduce yourself </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>DoWhat</tag>
+        <one-of>
+          <item> what can you do for us </item>
+        </one-of>
+      </item>
+      <item>
         <tag>PlayHarp</tag>
         <one-of>
           <item> Could you play some music on harp </item>
@@ -17,11 +50,100 @@
         </one-of>
       </item>
       <item>
-        <tag>Count</tag>
+        <tag>Number</tag>
+        <one-of>
+          <item> Can you count the number from one to five </item>
+          <item> Could you count the number from one to five </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>OneAndTwo</tag>
         <one-of>
           <item> what's one plus two </item>
           <item> what's one and two </item>
           <item> one plus two </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>FiveMinusOne</tag>
+        <one-of>
+          <item> what's five minus one</item>
+          <item> five minus one </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>Gesture</tag>
+        <one-of>
+          <item> Can you do some gesture recognition</item>
+          <item> Could you do some gesture recognition </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>GoAhead</tag>
+        <one-of>
+          <item> go ahead</item>
+        </one-of>
+      </item>
+      <item>
+        <tag>lab</tag>
+        <one-of>
+          <item> Can you introduce the robotics lab to us</item>
+          <item> Can you introduce the lab to us </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>NextOne</tag>
+        <one-of>
+          <item> Next one</item>
+        </one-of>
+      </item>
+      <item>
+        <tag>NextTwo</tag>
+        <one-of>
+          <item> Next two</item>
+        </one-of>
+      </item>
+      <item>
+        <tag>NextThree</tag>
+        <one-of>
+          <item> Next three</item>
+        </one-of>
+      </item>
+      <item>
+        <tag>Count</tag>
+        <one-of>
+          <item> Can you do some simple math calculation </item>
+          <item> Could you do some simple math calculation </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>Bye</tag>
+        <one-of>
+          <item> see you </item>
+          <item> bye bye </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>GoodMorning</tag>
+        <one-of>
+          <item> good morining </item>
+        </one-of>
+      </item>
+      <item>
+        <tag>URwelcome</tag>
+        <one-of>
+          <item> thanks </item>
+          <item> thank you very much</item>
+        </one-of>
+      </item>
+      <item>
+        <tag>GladSU</tag>
+        <one-of>
+          <item> good to meet you </item>
+          <item> glad to meet you </item>
+          <item> very nice to meet you</item>
+          <item> glad to see you</item>
+          <item> see you next time</item>
         </one-of>
       </item>
       <item>
@@ -43,6 +165,8 @@
         <one-of>
           <item> Could you play some music by hand</item>
           <item>  Would you like play some music by hand</item>
+          <item> Can you play some music for us</item>
+          <item> Could you play some music for us</item>
         </one-of>
       </item>
     </one-of>

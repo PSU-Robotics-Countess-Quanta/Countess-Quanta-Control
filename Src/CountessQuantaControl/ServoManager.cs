@@ -3,8 +3,7 @@
 // Winter 2014
 
 // ServoManager handles all communication with the Pololu Maestro servo controller. It implements
-// methods for changing servo settings, performing moves with multiple servos, and updating the 
-// person tracking position.
+// methods for changing servo settings and performing moves with multiple servos.
 
 using System;
 using System.Collections.Generic;
@@ -64,11 +63,18 @@ namespace CountessQuantaControl
             // Used to track whether the servo is currently moving.
             [XmlIgnore]
             public bool isMoving = false;
+
+            [XmlIgnore]
+            public bool isRunningHighPriorityMove = false;
+
+            [XmlIgnore]
+            public Object movePriorityLock = new Object();
         }
 
         List<Servo> servoList = new List<Servo>();
         Usc uscDevice = null;
         Object uscLock = new Object();
+        bool isEnabled = true;
 
         public ServoManager()
         {
@@ -97,7 +103,11 @@ namespace CountessQuantaControl
                     // device by serial number, you could simply add a line like this:
                     //   if (dli.serialNumber != "00012345"){ continue; }
 
-                    uscDevice = new Usc(dli); // Connect to the device.
+                    lock (uscLock)
+                    {
+                        uscDevice = new Usc(dli); // Connect to the device.
+                    }
+
                     break;  // Use first device (should only be one, anyway).
                 }
 
@@ -122,30 +132,36 @@ namespace CountessQuantaControl
         // Based on the 'TryToDisconnect' method from MaestroAdvancedExample in the pololu-usb-sdk.
         public void DisconnectFromHardware()
         {
-            if (uscDevice == null)
+            lock (uscLock)
             {
-                // Already disconnected
-                return;
-            }
+                if (uscDevice == null)
+                {
+                    // Already disconnected
+                    return;
+                }
 
-            try
-            {
-                uscDevice.Dispose();  // Disconnect
-            }
-            catch (Exception ex)
-            {
-                ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Error, "DisconnectFromHardware failed to cleaning disconnect the servo hardware: " + ex.Message);
-            }
-            finally
-            {
-                // do this no matter what
-                uscDevice = null;
+                try
+                {
+                    uscDevice.Dispose();  // Disconnect
+                }
+                catch (Exception ex)
+                {
+                    ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Error, "DisconnectFromHardware failed to cleaning disconnect the servo hardware: " + ex.Message);
+                }
+                finally
+                {
+                    // do this no matter what
+                    uscDevice = null;
+                }
             }
         }
 
         public bool IsConnected()
         {
-            return (uscDevice != null);
+            lock (uscLock)
+            {
+                return (uscDevice != null);
+            }
         }
 
         // Sets the servo controller with the default speeds and accelerations, for each servo.
@@ -219,6 +235,22 @@ namespace CountessQuantaControl
             WriteFileStream.Close();
         }
 
+        public long GetServoIndex(string servoName)
+        {
+
+            Servo servo = servoList.Find(x => x.name == servoName);
+
+            if (servo != null)
+            {
+                return servo.index;
+            }
+            else
+            {
+                ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Error, "GetServoIndex() failed to find servo '" + servoName + "'.");
+                return -1;
+            }
+        }
+
         // Reads the servo status from the servo controller hardware, and then updates the 
         // servoList with these new polled values. Also tracks whether each servo is currently 
         // moving by comparing their current and target positions.
@@ -240,12 +272,23 @@ namespace CountessQuantaControl
             {
                 // Get the servo parameters from the hardware.
                 ServoStatus[] servoStatusArray;
-                uscDevice.getVariables(out servoStatusArray);
+                long servoCount;
+
+                lock (uscLock)
+                {
+                    if (uscDevice == null)
+                    {
+                        throw new System.Exception("uscDevice is null");
+                    }
+
+                    uscDevice.getVariables(out servoStatusArray);
+                    servoCount = uscDevice.servoCount;
+                }
 
                 // Update the servoList with these parameters.
                 foreach (Servo servo in servoList)
                 {
-                    if (servo.index < 0 || servo.index >= uscDevice.servoCount)
+                    if (servo.index < 0 || servo.index >= servoCount)
                     {
                         ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Error, "UpdateServoValues() failed, servo index out of range. Servo index = " + servo.index.ToString());
                     }
@@ -314,13 +357,26 @@ namespace CountessQuantaControl
 
             try
             {
-                // Send this value to the hardware.
-                // Note that the servo position values are handled in this class in units of μs, 
-                // to match the convention used by Pololu's Maestro Control Center application. 
-                // However, the servo controller hardware expects the position represented as an 
-                // integer value in 0.25 μs. The local value must be multiplied by 4 to convert 
-                // to these units.
-                uscDevice.setTarget((byte)servo.index, (ushort)(position * 4));
+                lock (uscLock)
+                {
+                    if (!isEnabled)
+                    {
+                        return;
+                    }
+
+                    if (uscDevice == null)
+                    {
+                        throw new System.Exception("uscDevice is null");
+                    }
+
+                    // Send this value to the hardware.
+                    // Note that the servo position values are handled in this class in units of μs, 
+                    // to match the convention used by Pololu's Maestro Control Center application. 
+                    // However, the servo controller hardware expects the position represented as an 
+                    // integer value in 0.25 μs. The local value must be multiplied by 4 to convert 
+                    // to these units.
+                    uscDevice.setTarget((byte)servo.index, (ushort)(position * 4));
+                }
             }
             catch (System.Exception ex)
             {
@@ -353,8 +409,16 @@ namespace CountessQuantaControl
 
             try
             {
-                // Send this value to the hardware.
-                uscDevice.setSpeed((byte)servo.index, (ushort)speed);
+                lock (uscLock)
+                {
+                    if (uscDevice == null)
+                    {
+                        throw new System.Exception("uscDevice is null");
+                    }
+
+                    // Send this value to the hardware.
+                    uscDevice.setSpeed((byte)servo.index, (ushort)speed);
+                }
             }
             catch (System.Exception ex)
             {
@@ -369,8 +433,16 @@ namespace CountessQuantaControl
 
             try
             {
-                // Send this value to the hardware.
-                uscDevice.setAcceleration((byte)servo.index, (ushort)acceleration);
+                lock (uscLock)
+                {
+                    if (uscDevice == null)
+                    {
+                        throw new System.Exception("uscDevice is null");
+                    }
+
+                    // Send this value to the hardware.
+                    uscDevice.setAcceleration((byte)servo.index, (ushort)acceleration);
+                }
             }
             catch (System.Exception ex)
             {
@@ -385,16 +457,45 @@ namespace CountessQuantaControl
         {
             ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Info, "Disabling all servos.");
 
+            lock (uscLock)
+            {
+                isEnabled = false;
+            }
+
             foreach (Servo servo in servoList)
             {
                 try
                 {
-                    uscDevice.setTarget((byte)servo.index, 0);
+                    lock (uscLock)
+                    {
+                        if (uscDevice == null)
+                        {
+                            throw new System.Exception("uscDevice is null");
+                        }
+
+                        uscDevice.setTarget((byte)servo.index, 0);
+                    }
                 }
                 catch (System.Exception ex)
                 {
                     ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Error, "Caught exception in DisableAllServos(): " + ex.Message);
                 }
+            }
+        }
+
+        public void EnableAllServos()
+        {
+            lock (uscLock)
+            {
+                isEnabled = true;
+            }
+        }
+
+        public bool IsEnabled()
+        {
+            lock (uscLock)
+            {
+                return isEnabled;
             }
         }
 
@@ -481,6 +582,12 @@ namespace CountessQuantaControl
 
             while (true)
             {
+                if (!IsEnabled())
+                {
+                    ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Warning, "WaitForMoveComplete interrupted, servos are disabled.");
+                    return;
+                }
+
                 if (currentPollCount >= pollTimeoutCount)
                 {
                     ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Warning, "WaitForMoveComplete timeout, servos failed to reach destination in " + pollTimeout.ToString() + " seconds.");
@@ -515,10 +622,41 @@ namespace CountessQuantaControl
         // servos to finish moving.
         public void MoveServos(List<ServoPosition> servoPositionList, double timeToDestination)
         {
+            if (!IsEnabled())
+            {
+                ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Warning, "MoveServos failed, servos are disabled.");
+                return;
+            }
+
+            ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Debug, "MoveServos moving servos over " + timeToDestination + " seconds.");
+
+            foreach (ServoPosition servoPosition in servoPositionList)
+            {
+                Servo servo = servoList.Find(x => x.index == servoPosition.index);
+
+                lock (servo.movePriorityLock)
+                {
+                    ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Debug, "MoveServos set isRunningHighPriorityMove for servo " + servo.index.ToString() + ".");
+                    servo.isRunningHighPriorityMove = true;
+                }
+            }
+
             if (!IsConnected())
             {
                 // Simulate the move.
                 Thread.Sleep((int)(timeToDestination * 1000));
+
+                foreach (ServoPosition servoPosition in servoPositionList)
+                {
+                    Servo servo = servoList.Find(x => x.index == servoPosition.index);
+
+                    lock (servo.movePriorityLock)
+                    {
+                        ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Debug, "MoveServos cleared isRunningHighPriorityMove for servo " + servo.index.ToString() + ".");
+                        servo.isRunningHighPriorityMove = false;
+                    }
+                }
+
                 return;
             }
 
@@ -528,160 +666,52 @@ namespace CountessQuantaControl
             }
 
             WaitForMoveComplete(servoPositionList, timeToDestination);
+
+            foreach (ServoPosition servoPosition in servoPositionList)
+            {
+                Servo servo = servoList.Find(x => x.index == servoPosition.index);
+
+                lock (servo.movePriorityLock)
+                {
+                    ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Debug, "MoveServos cleared isRunningHighPriorityMove for servo " + servo.index.ToString() + ".");
+                    servo.isRunningHighPriorityMove = false;
+                }
+            }
         }
 
-        // Starts the specified servo move using the specified speed.
-        private void StartSpeedMove(ServoPosition servoPosition, long servoSpeed)
+        // Starts the specified servo move using the specified speed. StartSpeedMove is used by PersonTracking 
+        // and RobotSpeech, which are lower priority moves than those issued through Sequences. StartSpeedMove 
+        // motion can be interrupted by Sequence moves, and new StartSpeedMove moves are ignored if a Sequence 
+        // is already moving this servo.
+        public void StartSpeedMove(ServoPosition servoPosition, long servoSpeed)
         {
+            if (!IsEnabled())
+            {
+                ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Debug, "StartSpeedMove failed, servos are disabled.");
+                return;
+            }
+
+            ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Debug, "StartSpeedMove moving servo " + servoPosition.index.ToString() + " to position " + servoPosition.position.ToString() + " at speed " + servoSpeed.ToString() + ".");
+
             Servo servo = servoList.Find(x => x.index == servoPosition.index);
-            SetServoSpeed(servo, servoSpeed);
-            SetServoPosition(servo, servoPosition.position);
-        }
 
-        DateTime lastUpdateTime = new DateTime();
-        Object personTrackingLock = new Object();
-        bool isAlreadyUpdatingTracking = false;
-        bool trackingEnabled = true;
-
-        // Moves the robot's head/eyes to track the specified skeleton joint.
-        public void PersonTrackingUpdate(SkeletonPoint targetPosition)
-        {
-            // Only update if tracking is allowed and if we're not already updating in a 
-            // different thread.
-            lock (personTrackingLock)
+            lock (servo.movePriorityLock)
             {
-                if (!trackingEnabled)
+                if (servo.isRunningHighPriorityMove)
+                {
+                    // Ignore this command if a higher priority (i.e. Sequence) move is already running.
+
+                    ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Debug, "StartSpeedMove, isRunningHighPriorityMove is set for servo " + servo.index.ToString() + ". Aborting move.");
+                    return;
+                }
+
+                if (!IsConnected())
                 {
                     return;
                 }
 
-                if (isAlreadyUpdatingTracking)
-                {
-                    return;
-                }
-                else
-                {
-                    isAlreadyUpdatingTracking = true;
-                }
-            }
-
-            // Only update once every 100ms, even if we're receiving new joint positions 
-            // more frequently than this.
-            TimeSpan timeBetweenUpdates = new TimeSpan(0, 0, 0, 0, 100);
-
-            if (DateTime.Now - lastUpdateTime < timeBetweenUpdates)
-            {
-                lock (personTrackingLock)
-                {
-                    isAlreadyUpdatingTracking = false;
-                }
-
-                return;
-            }
-
-            lastUpdateTime = DateTime.Now;
-
-            // Position of the robot neck and eye servos at which the robot faces straight forward.
-            const double servoCenterPostion_HeadHorizontal = 1550;
-            const double servoCenterPostion_HeadVertical = 1500;
-            const double servoCenterPostion_Eyes = 1600;
-
-            const double servoOffset_HeadVertical = 0;
-
-            // Number of servo position increments per radian of rotation for each of the servos.
-            const double servoIncrementsPerRadian_HeadHorizontal = 800;
-            const double servoIncrementsPerRadian_HeadVertical = 1000;
-            const double servoIncrementsPerRadian_Eyes = 800;
-
-            // Tracking speed of each servo.
-            const long servoSpeed_HeadHorizontal = 30;
-            const long servoSpeed_HeadVertical = 30;
-            const long servoSpeed_Eyes = 1000;
-
-            if (IsConnected())
-            {
-                UpdateServoValues();
-            }
-
-            Servo headHorizontalServo = servoList.Find(x => x.index == 10);
-            if (headHorizontalServo == null)
-            {
-                lock (personTrackingLock)
-                {
-                    isAlreadyUpdatingTracking = false;
-                }
-
-                // Log Error
-                return;
-            }
-
-            // Calculate the current position of the head.
-            double currentPosition_HeadHorizontal = headHorizontalServo.polledPosition / 4.0;
-            double currentAngle_HeadHorizontal = (servoCenterPostion_HeadHorizontal - currentPosition_HeadHorizontal) / servoIncrementsPerRadian_HeadHorizontal;
-
-            // Calculate the angle to the target joint.
-            double targetAngle_Horizontal = Math.Atan(targetPosition.X / targetPosition.Z);
-            double targetAngle_Vertical = Math.Atan(targetPosition.Y / targetPosition.Z);
-
-            // Calculate the new head position to face this target joint.
-            double newServoPosition_HeadHorizontal = servoCenterPostion_HeadHorizontal - targetAngle_Horizontal * servoIncrementsPerRadian_HeadHorizontal;
-            double newServoPosition_HeadVertical = servoCenterPostion_HeadVertical + servoOffset_HeadVertical + targetAngle_Vertical * servoIncrementsPerRadian_HeadVertical;
-
-            // Eye position with head at center.
-            double newServoPosition_Eyes = servoCenterPostion_Eyes + targetAngle_Horizontal * servoIncrementsPerRadian_Eyes;
-
-            // Eye position based on current head position.
-            //double newServoPosition_Eyes = servoCenterPostion_Eyes + (targetAngle_Horizontal - currentAngle_HeadHorizontal) * servoIncrementsPerRadian_Eyes;
-
-            //ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Warning, "PersonTrackingUpdate: targetAngle_Horizontal = " + targetAngle_Horizontal + ", newServoPosition_HeadHorizontal = " + newServoPosition_HeadHorizontal + ", newServoPosition_Eyes = " + newServoPosition_Eyes);
-
-
-            if (IsConnected())
-            {
-                // Update with head motion.
-                StartSpeedMove(new ServoPosition(10, newServoPosition_HeadHorizontal), servoSpeed_HeadHorizontal);
-                StartSpeedMove(new ServoPosition(9, newServoPosition_HeadVertical), servoSpeed_HeadVertical);
-
-                // Update with only eye motion.
-                //StartSpeedMove(new ServoPosition(10, servoCenterPostion_HeadHorizontal), servoSpeed_HeadHorizontal);
-                //StartSpeedMove(new ServoPosition(9, servoCenterPostion_HeadVertical), servoSpeed_HeadVertical);
-                //StartSpeedMove(new ServoPosition(8, newServoPosition_Eyes), servoSpeed_Eyes);
-            }
-
-            lock (personTrackingLock)
-            {
-                isAlreadyUpdatingTracking = false;
-            }
-        }
-
-        // Enable or disable person tracking feature.
-        public void PersonTrackingEnable(bool enableTracking)
-        {
-            lock (personTrackingLock)
-            {
-                trackingEnabled = enableTracking;
-
-                if (enableTracking)
-                {
-                    return;
-                }
-
-                if (!isAlreadyUpdatingTracking)
-                {
-                    return;
-                }
-            }
-
-            // If tracking was disabled, but is currently updating, then wait for last update to complete.
-            bool updateIsComplete = false;
-            while (!updateIsComplete)
-            {
-                Thread.Sleep(10);
-
-                lock (personTrackingLock)
-                {
-                    updateIsComplete = !isAlreadyUpdatingTracking;
-                }
+                SetServoSpeed(servo, servoSpeed);
+                SetServoPosition(servo, servoPosition.position);
             }
         }
     }

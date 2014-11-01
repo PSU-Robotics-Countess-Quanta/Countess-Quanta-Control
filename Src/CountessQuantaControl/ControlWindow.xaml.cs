@@ -31,10 +31,13 @@ namespace CountessQuantaControl
         const string servoConfigFileName = "ServoConfig.xml";
 
         ServoManager servoManager;
+        AriaManager ariaManager;
+        RobotSpeech robotSpeech;
+        RobotEyes robotEyes;
         SequenceProcessor sequenceProcessor;
+        PersonTracking personTracking;
         KinectManager kinectManager;
         SkeletonViewer skeletonViewer;
-        SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
         System.Windows.Threading.DispatcherTimer logUpdateTimer = new System.Windows.Threading.DispatcherTimer();
 
         public ControlWindow()
@@ -45,11 +48,23 @@ namespace CountessQuantaControl
             servoManager.ConnectToHardware();
             UpdateConnectedTextblock(servoManager.IsConnected(), servoHardwareState);
 
-            sequenceProcessor = new SequenceProcessor(servoManager, sequenceFileName);
+            ariaManager = new AriaManager();
+            ariaManager.InitializeAria();
+            UpdateConnectedTextblock(ariaManager.IsConnected(), ariaHardwareState);
 
-            kinectManager = new KinectManager(sequenceProcessor);
+            robotSpeech = new RobotSpeech(servoManager);
+
+            robotEyes = new RobotEyes();
+            robotEyes.InitializeHardware();
+
+            personTracking = new PersonTracking(servoManager, ariaManager);
+
+            sequenceProcessor = new SequenceProcessor(servoManager, ariaManager, robotSpeech, robotEyes, sequenceFileName);
+
+            kinectManager = new KinectManager(sequenceProcessor, personTracking, robotSpeech);
             kinectManager.InitializeKinect();
             UpdateConnectedTextblock(kinectManager.IsConnected(), kinectHardwareState);
+            UpdateMotionEnabledDisplay();
 
             logUpdateTimer.Tick += new EventHandler(logUpdateTimer_Tick);
             logUpdateTimer.Interval = new TimeSpan(0, 0, 0, 0, 500);
@@ -70,6 +85,38 @@ namespace CountessQuantaControl
             }
         }
 
+        private void ToggleMotionEnable()
+        {
+            if (servoManager.IsEnabled() || ariaManager.IsEnabled())
+            {
+                servoManager.DisableAllServos();
+                ariaManager.DisableMotion();
+            }
+            else
+            {
+                servoManager.EnableAllServos();
+                ariaManager.EnableMotion();
+            }
+
+            UpdateMotionEnabledDisplay();
+        }
+
+        private void UpdateMotionEnabledDisplay()
+        {
+            if (servoManager.IsEnabled() || ariaManager.IsEnabled())
+            {
+                motionEnableText.Text = "Enabled";
+                motionEnableText.Foreground = new SolidColorBrush(Colors.Green);
+                motionEnableButton.Content = "Disable Motion";
+            }
+            else
+            {
+                motionEnableText.Text = "Disabled";
+                motionEnableText.Foreground = new SolidColorBrush(Colors.Red);
+                motionEnableButton.Content = "Enable Motion";
+            }
+        }
+
         private void logUpdateTimer_Tick(object sender, EventArgs e)
         {
             if (ErrorLogging.NewLogMessageAvailable())
@@ -86,6 +133,9 @@ namespace CountessQuantaControl
             servoManager.ConnectToHardware();
             UpdateConnectedTextblock(servoManager.IsConnected(), servoHardwareState);
 
+            ariaManager.InitializeAria();
+            UpdateConnectedTextblock(ariaManager.IsConnected(), ariaHardwareState);
+
             kinectManager.InitializeKinect();
             UpdateConnectedTextblock(kinectManager.IsConnected(), kinectHardwareState);
         }
@@ -97,7 +147,7 @@ namespace CountessQuantaControl
         private void RunSequence_Click(object sender, RoutedEventArgs e)
         {
             sequenceProcessor.LoadSequenceFile(sequenceFileName);
-            sequenceProcessor.RunSequence("Test Sequence");
+            sequenceProcessor.RunSequence(SelectedSequenceBox.Text);
         }
 
 
@@ -147,14 +197,19 @@ namespace CountessQuantaControl
             skeletonViewer.Show();
         }
 
+        SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
         private void TestSpeech_Click(object sender, RoutedEventArgs e)
         {
-            speechSynthesizer.Speak("This is a test");
+            //System.Collections.ObjectModel.ReadOnlyCollection<InstalledVoice> voices = speechSynthesizer.GetInstalledVoices();
+            speechSynthesizer.SelectVoice("Microsoft Anna");
+            speechSynthesizer.Rate = -3;
+            speechSynthesizer.SpeakAsyncCancelAll();
+            speechSynthesizer.SpeakAsync(textToSpeechTextBox.Text);
         }
 
-        private void RelaxServos_Click(object sender, RoutedEventArgs e)
+        private void ToggleMotionEnable_Click(object sender, RoutedEventArgs e)
         {
-            servoManager.DisableAllServos();
+            ToggleMotionEnable();
         }
 
         private void speechRecognitionEnableCheckbox_Click(object sender, RoutedEventArgs e)
@@ -175,10 +230,55 @@ namespace CountessQuantaControl
 
         private void personTrackingEnableCheckbox_Click(object sender, RoutedEventArgs e)
         {
-            if (kinectManager != null)
+            if (personTracking != null)
             {
-                kinectManager.EnablePersonTracking(((CheckBox)sender).IsChecked == true);
+                personTracking.Enable(((CheckBox)sender).IsChecked == true);
             }
+        }
+
+
+        private void LoggingLevelBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            List<string> loggingLevels = new List<string>();
+            loggingLevels.Add(ErrorLogging.LoggingLevel.Error.ToString());
+            loggingLevels.Add(ErrorLogging.LoggingLevel.Warning.ToString());
+            loggingLevels.Add(ErrorLogging.LoggingLevel.Info.ToString());
+            loggingLevels.Add(ErrorLogging.LoggingLevel.Debug.ToString());
+
+            var comboBox = sender as ComboBox;
+            comboBox.ItemsSource = loggingLevels;
+            comboBox.SelectedIndex = 2; // Default to Info.
+        }
+
+        private void LoggingLevelBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            string comboBoxSelectedItem = comboBox.SelectedItem as string;
+
+            var loggingLevelValues = Enum.GetValues(typeof(ErrorLogging.LoggingLevel));
+            foreach (ErrorLogging.LoggingLevel loggingLevel in loggingLevelValues)
+            {
+                if (loggingLevel.ToString() == comboBoxSelectedItem)
+                {
+                    ErrorLogging.SetLoggingDisplayLevel(loggingLevel);
+                    return;
+                }
+            }
+        }
+
+        private void SelectedSequenceBox_DropDownOpened(object sender, EventArgs e)
+        {
+            sequenceProcessor.LoadSequenceFile(sequenceFileName);
+            List<string> listOfSequenceNames = sequenceProcessor.GetSequenceList();
+
+            var comboBox = sender as ComboBox;
+            comboBox.ItemsSource = listOfSequenceNames;
+        }
+
+        private void ConnectAria_Click(object sender, RoutedEventArgs e)
+        {
+            ariaManager.InitializeAriaHardware();
+            UpdateConnectedTextblock(ariaManager.IsConnected(), ariaHardwareState);
         }
     }
 }

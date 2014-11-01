@@ -35,12 +35,37 @@ namespace CountessQuantaControl
         }
     }
 
+    // A WheelMove is described either in terms of translation and rotation 
+    // components, or as right and left wheel motion.
+    public class WheelMove
+    {
+        [XmlAttribute("Translation")]
+        public double translation;
+
+        [XmlAttribute("Rotation")]
+        public double rotation;
+
+        [XmlAttribute("LeftWheel")]
+        public double leftWheel;
+
+        [XmlAttribute("RightWheel")]
+        public double rightWheel;
+
+        public WheelMove()
+        {
+
+        }
+    }
+
     // A Frame contains a command to speak with the synthesizer, delay for a 
     // length of time, or move a set of servos, or some combination of these.
     public class Frame
     {
         [XmlElement("ServoPosition")]
         public List<ServoPosition> servoPositionList = new List<ServoPosition>();
+        
+        [XmlElement("WheelMove")]
+        public WheelMove wheelMove = new WheelMove();
 
         [XmlAttribute("Name")]
         public string name;
@@ -53,6 +78,9 @@ namespace CountessQuantaControl
 
         [XmlAttribute("Delay")]
         public double delay;
+
+        [XmlAttribute("EyeState")]
+        public string eyeState;
 
         public Frame()
         {

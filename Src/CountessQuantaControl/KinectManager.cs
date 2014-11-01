@@ -22,20 +22,23 @@ namespace CountessQuantaControl
 {
     public class KinectManager
     {
-        private KinectSensor sensor;
-        private SpeechRecognitionEngine speechEngine;
-        private SequenceProcessor sequenceProcessor;
+        KinectSensor sensor;
+        SpeechRecognitionEngine speechEngine;
+        SequenceProcessor sequenceProcessor;
+        PersonTracking personTracking;
+        RobotSpeech robotSpeech;
 
         Object speechLock = new Object();
         bool synthesizerIsSpeaking = false;
 
-        bool personTrackingEnabled = true;
-        bool speechRecognitionEnabled = true;
-        bool gestureRecognitionEnabled = true;
+        bool speechRecognitionEnabled = false;
+        bool gestureRecognitionEnabled = false;
 
-        public KinectManager(SequenceProcessor sequenceProcessor)
+        public KinectManager(SequenceProcessor sequenceProcessor, PersonTracking personTracking, RobotSpeech robotSpeech)
         {
             this.sequenceProcessor = sequenceProcessor;
+            this.personTracking = personTracking;
+            this.robotSpeech = robotSpeech;
         }
 
         // Connect to the Kinect sensor and begin processing events.
@@ -120,8 +123,8 @@ namespace CountessQuantaControl
                 speechEngine.SpeechRecognized += SpeechRecognized;
                 speechEngine.SpeechRecognitionRejected += SpeechRejected;
 
-                sequenceProcessor.SpeakStarted += SpeakStarted;
-                sequenceProcessor.SpeakCompleted += SpeakCompleted;
+                robotSpeech.SpeakStarted += SpeakStarted;
+                robotSpeech.SpeakCompleted += SpeakCompleted;
 
                 // For long recognition sessions (a few hours or more), it may be beneficial to turn off adaptation of the acoustic model. 
                 // This will prevent recognition accuracy from degrading over time.
@@ -142,11 +145,6 @@ namespace CountessQuantaControl
         public bool IsConnected()
         {
             return (this.sensor != null);
-        }
-
-        public void EnablePersonTracking(bool enable)
-        {
-            personTrackingEnabled = enable;
         }
 
         public void EnableSpeechRecognition(bool enable)
@@ -224,6 +222,56 @@ namespace CountessQuantaControl
                         sequenceName = "Hello";
                         break;
 
+                        
+                    case "HowAreUDoing":
+                        sequenceName = "HowAreUDoing";
+                        break;
+
+                    case "Introduce":
+                        sequenceName = "Introduce";
+                        break;
+
+
+                    case "Number":
+                        sequenceName = "Number";
+                        break;
+
+                    case "DoWhat":
+                        sequenceName = "DoWhat";
+                        break;
+
+                    case "Thanks":
+                        sequenceName = "Thanks";
+                        break;
+
+                    case "Count":
+                        sequenceName = "Count";
+                        break;
+
+                    case "OneAndTwo":
+                        sequenceName = "OneAndTwo";
+                        break;
+
+                    case "FiveMinusOne":
+                        sequenceName = "FiveMinusOne";
+                        break;
+
+                    case "Gesture":
+                        sequenceName = "Gesture";
+                        break;
+
+                    case "NextOne":
+                        sequenceName = "NextOne";
+                        break;
+
+                    case "NextTwo":
+                        sequenceName = "NextTwo";
+                        break;
+
+                    case "NextThree":
+                        sequenceName = "NextThree";
+                        break;
+
                      case "PlayHarp":
                         sequenceName = "PlayHarp";
                         break;
@@ -232,18 +280,51 @@ namespace CountessQuantaControl
                         sequenceName = "PLAYMUSIC";
                         break;
 
-                    case "Count":
-                        sequenceName = "Count";
+                    case "lab":
+                        sequenceName = "lab";
                         break;
 
+                    case "GoAhead":
+                        sequenceName = "GoAhead";
+                        break;
+                        
                     case "NAME":
                         sequenceName = "NAME";
+                        break;
+
+                    case "Bye":
+                        sequenceName = "Bye";
+                        break;
+
+                    case "GoodMorning":
+                        sequenceName = "GoodMorning";
+                        break;
+
+                    case "URwelcome":
+                        sequenceName = "URwelcome";
+                        break;
+
+                    case "GladSU":
+                        sequenceName = "GladSU";
                         break;
 
                     case "DEFAULT":
                         sequenceName = "DEFAULT";
                         break;
                 }
+
+                if (sequenceName != "")
+                {
+                    sequenceProcessor.RunSequence(sequenceName);
+                }
+            }
+            else
+            {
+                // If speech is not recognized, then use a random default response.
+
+                Random randomGenerator = new Random();
+                int randomSequenceNumber = randomGenerator.Next(1, 5);
+                string sequenceName = "DEFAULT" + randomSequenceNumber.ToString();
 
                 if (sequenceName != "")
                 {
@@ -317,6 +398,8 @@ namespace CountessQuantaControl
             }
         }
 
+        int trackedSkeletonId = 0;
+
         // Gesture trigger definitions.
         //GestureTrigger leftHandGesture = new GestureTrigger();
         //GestureTrigger rightHandGesture = new GestureTrigger();
@@ -343,36 +426,72 @@ namespace CountessQuantaControl
 
             if (skeletons.Length != 0)
             {
+                bool isTrackingSameSkeleton = false;
+                int skeletonIdClosestToCenter = 0;
+                float shortestDistanceFromCenter = 0;
+
+                // First, check if this skeleton frame contains the skeleton that we were already tracking.
                 foreach (Skeleton skel in skeletons)
                 {
                     if (skel.TrackingState == SkeletonTrackingState.Tracked)
                     {
-                        if (personTrackingEnabled)
+                        if (skel.TrackingId == trackedSkeletonId)
                         {
-                            sequenceProcessor.PersonTrackingUpdate(skel.Joints[JointType.Head].Position);
+                            isTrackingSameSkeleton = true;
+                            break;
+                        }
+                        else if (skeletonIdClosestToCenter == 0 || Math.Abs(skel.Joints[JointType.ShoulderCenter].Position.X) < shortestDistanceFromCenter)
+                        {
+                            skeletonIdClosestToCenter = skel.TrackingId;
+                            shortestDistanceFromCenter = Math.Abs(skel.Joints[JointType.ShoulderCenter].Position.X);
+                        }
+                    }
+                }
+
+                // If the skeleton frame does not contain the one we were tracking, then track the skeleton that is closest to the center of the image (x-axis).
+                if (!isTrackingSameSkeleton)
+                {
+                    trackedSkeletonId = skeletonIdClosestToCenter;
+
+                    ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Debug, "SensorSkeletonFrameReady() now tracking skeleton ID " + trackedSkeletonId.ToString() + ".");
+                }
+
+                // Update person tracking and check gestures from the tracked skeleton.
+                foreach (Skeleton skel in skeletons)
+                {
+                    // Only pay attention to the tracked skeleton.
+                    if (skel.TrackingId == trackedSkeletonId)
+                    {
+                        // Only pay attention to the skeleton if it is within the right and left edges of the view.
+                        // This should help prevent detecting false gestures, due to the skeleton being scrambled as it leaves the viewing area.
+                        if ((skel.ClippedEdges & FrameEdges.Left) == 0 && (skel.ClippedEdges & FrameEdges.Right) == 0)
+                        {
+                            personTracking.UpdatePosition(skel.Joints[JointType.ShoulderCenter].Position);
+
+                            if (gestureRecognitionEnabled)
+                            {
+                                // Check gesture recognition conditions.
+
+                                //leftHandGesture.Evaluate(sequenceProcessor, skel.Joints[JointType.HandLeft].Position.Y > skel.Joints[JointType.ElbowLeft].Position.Y, "Left Hand Raised");
+
+                                //rightHandGesture.Evaluate(sequenceProcessor, skel.Joints[JointType.HandRight].Position.Y > skel.Joints[JointType.ElbowRight].Position.Y, "Right Hand Raised");
+
+                                RightHandAboveHead.Evaluate(sequenceProcessor, skel.Joints[JointType.HandRight].Position.Y > skel.Joints[JointType.Head].Position.Y, "Hello");
+
+                                RightHandBetweenSpineAndShoulderCenter.Evaluate(sequenceProcessor, skel.Joints[JointType.HandRight].Position.Y > skel.Joints[JointType.Spine].Position.Y && skel.Joints[JointType.HandRight].Position.Y < skel.Joints[JointType.ShoulderCenter].Position.Y && skel.Joints[JointType.HandRight].Position.X < (skel.Joints[JointType.Spine].Position.X + 0.1), "PLAYMUSIC");
+
+                                LeftElbowAboveLeftShoulder.Evaluate(sequenceProcessor, skel.Joints[JointType.ElbowLeft].Position.Y > skel.Joints[JointType.ShoulderLeft].Position.Y, "NeckRotate");
+
+                                WalkCloseToKinect.Evaluate(sequenceProcessor, skel.Joints[JointType.Spine].Position.Z < 1.5, "ArmRaise");
+
+                                // [Add new Evaluate calls here]
+                            }
+                        }
+                        else
+                        {
+                            ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Debug, "SensorSkeletonFrameReady() skipped update due to skeleton being outside of view.");
                         }
 
-                        if (gestureRecognitionEnabled)
-                        {
-                            // Check gesture recognition conditions.
-
-                            //leftHandGesture.Evaluate(sequenceProcessor, skel.Joints[JointType.HandLeft].Position.Y > skel.Joints[JointType.ElbowLeft].Position.Y, "Left Hand Raised");
-
-                            //rightHandGesture.Evaluate(sequenceProcessor, skel.Joints[JointType.HandRight].Position.Y > skel.Joints[JointType.ElbowRight].Position.Y, "Right Hand Raised");
-
-                            RightHandAboveHead.Evaluate(sequenceProcessor, skel.Joints[JointType.HandRight].Position.Y > skel.Joints[JointType.Head].Position.Y, "Hello");
-
-                            RightHandBetweenSpineAndShoulderCenter.Evaluate(sequenceProcessor, skel.Joints[JointType.HandRight].Position.Y > skel.Joints[JointType.Spine].Position.Y && skel.Joints[JointType.HandRight].Position.Y < skel.Joints[JointType.ShoulderCenter].Position.Y && skel.Joints[JointType.HandRight].Position.X < (skel.Joints[JointType.Spine].Position.X + 0.1), "PLAYMUSIC");
-
-                            LeftElbowAboveLeftShoulder.Evaluate(sequenceProcessor, skel.Joints[JointType.ElbowLeft].Position.Y > skel.Joints[JointType.ShoulderLeft].Position.Y, "NeckRotate");
-
-                            WalkCloseToKinect.Evaluate(sequenceProcessor, skel.Joints[JointType.Spine].Position.Z < 1.5, "ArmRaise");
-
-                            // [Add new Evaluate calls here]
-                        }
-
-
-                        // Stop after first tracked skeleton
                         break;
                     }
                 }

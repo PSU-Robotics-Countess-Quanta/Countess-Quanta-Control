@@ -8,8 +8,8 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="220"/>
             <ColumnDefinition Width="220"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
@@ -19,23 +19,43 @@
                 <TextBlock Name="servoHardwareState" FontSize="14"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="5">
+                <TextBlock Text="Wheel State: " FontSize="14"/>
+                <TextBlock Name="ariaHardwareState" FontSize="14"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5">
                 <TextBlock Text="Kinect State: " FontSize="14"/>
                 <TextBlock Name="kinectHardwareState" FontSize="14"/>
             </StackPanel>
-            <Button Content="Reinitialize Hardware" Margin="10" Click="InitializeHardware_Click"/>
-            <Button Content="Relax Servos" Margin="10" Click="RelaxServos_Click"/>
+            <Button Content="Connect Wheel Hardware" Margin="7" Click="ConnectAria_Click"/>
+            <Button Content="Reinitialize Hardware" Margin="7" Click="InitializeHardware_Click"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Margin="10" Text="Logging Level:"/>
+                <ComboBox Margin="5" Width="100" Loaded="LoggingLevelBox_Loaded" SelectionChanged="LoggingLevelBox_SelectionChanged"/>
+            </StackPanel>
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="1">
-            <Button Content="Generate Example Xmls" Margin="10" Click="GenerateExampleXmls_Click"/>
-            <Button Content="Test Text-to-Speech" Margin="10" Click="TestSpeech_Click" />
-            <Button Content="Run Test Sequence" Margin="10" Click="RunSequence_Click" />
-            <Button Content="Show Skeleton Viewer" Margin="10" Click="SkeletonViewer_Click" />
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <TextBlock Text="Motion State: " FontSize="14"/>
+                <TextBlock Name="motionEnableText" FontSize="14"/>
+            </StackPanel>
+            <Button Name="motionEnableButton" Content="Disable Motion" Margin="10" Click="ToggleMotionEnable_Click"/>
+            <TextBlock Text="Feature Controls:" Margin ="5" FontSize="14"/>
+            <CheckBox Content="Speech Recognition Enabled" Click="speechRecognitionEnableCheckbox_Click" IsChecked="False" Margin ="5" FontSize="14"/>
+            <CheckBox Content="Gesture Recognition Enabled" Click="gestureRecognitionEnableCheckbox_Click" IsChecked="False" Margin ="5" FontSize="14"/>
+            <CheckBox Content="Person Tracking Enabled" Click="personTrackingEnableCheckbox_Click" IsChecked="False" Margin ="5" FontSize="14"/>
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="2">
-            <TextBlock Text="Feature Controls:" Margin ="5" FontSize="14"/>
-            <CheckBox Content="Speech Recognition Enabled" Click="speechRecognitionEnableCheckbox_Click" IsChecked="True" Margin ="5" FontSize="14"/>
-            <CheckBox Content="Gesture Recognition Enabled" Click="gestureRecognitionEnableCheckbox_Click" IsChecked="True" Margin ="5" FontSize="14"/>
-            <CheckBox Content="Person Tracking Enabled" Click="personTrackingEnableCheckbox_Click" IsChecked="True" Margin ="5" FontSize="14"/>
+            <Button Content="Test Text-to-Speech" Margin="7" Click="TestSpeech_Click" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Margin="10" Text="Speak:"/>
+                <TextBox Margin="5" Width="160" Name="textToSpeechTextBox" Text="Testing one two three."/>
+            </StackPanel>
+            <Button Content="Run Motion Sequence" Margin="7" Click="RunSequence_Click" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Margin="10" Text="Sequence:"/>
+                <ComboBox Margin="5" Width="130" Name="SelectedSequenceBox" DropDownOpened="SelectedSequenceBox_DropDownOpened"/>
+            </StackPanel>
+            <Button Content="Show Skeleton Viewer" Margin="7" Click="SkeletonViewer_Click" />
         </StackPanel>
         <ScrollViewer Name="LoggingScrollViewer" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Margin="5">
             <TextBox Name="LoggingTextBox" />

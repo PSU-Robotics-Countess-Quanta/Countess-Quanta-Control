@@ -81,8 +81,6 @@ namespace CountessQuantaControl
         /// </summary>
         private DrawingImage imageSource;
 
-        //RobotDisplay robotDisplayWindow;
-
         KinectManager kinectManager;
 
         /// <summary>
@@ -152,59 +150,6 @@ namespace CountessQuantaControl
 
             // Display the drawing using our image control
             Image.Source = this.imageSource;
-
-            //// Look through all sensors and start the first connected one.
-            //// This requires that a Kinect is connected at the time of app startup.
-            //// To make your app robust against plug/unplug, 
-            //// it is recommended to use KinectSensorChooser provided in Microsoft.Kinect.Toolkit (See components in Toolkit Browser).
-            //foreach (var potentialSensor in KinectSensor.KinectSensors)
-            //{
-            //    if (potentialSensor.Status == KinectStatus.Connected)
-            //    {
-            //        this.sensor = potentialSensor;
-            //        break;
-            //    }
-            //}
-
-            //if (null != this.sensor)
-            //{
-            //    // Turn on the skeleton stream to receive skeleton frames
-            //    this.sensor.SkeletonStream.Enable();
-
-            //    // Add an event handler to be called whenever there is new color frame data
-            //    this.sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
-
-            //    // Start the sensor!
-            //    try
-            //    {
-            //        this.sensor.Start();
-            //    }
-            //    catch (IOException)
-            //    {
-            //        this.sensor = null;
-            //    }
-            //}
-
-            //if (null == this.sensor)
-            //{
-            //    //this.statusBarText.Text = Properties.Resources.NoKinectReady;
-            //}
-
-            //robotDisplayWindow = new RobotDisplay();
-            //robotDisplayWindow.Show();
-        }
-
-        /// <summary>
-        /// Execute shutdown tasks
-        /// </summary>
-        /// <param name="sender">object sending the event</param>
-        /// <param name="e">event arguments</param>
-        private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            //if (null != this.sensor)
-            //{
-            //    this.sensor.Stop();
-            //}
         }
 
         /// <summary>
@@ -362,32 +307,6 @@ namespace CountessQuantaControl
             }
 
             drawingContext.DrawLine(drawPen, this.SkeletonPointToScreen(joint0.Position), this.SkeletonPointToScreen(joint1.Position));
-
-            // If the Head joint is updated, update the target position on the RobotDisplay form.
-            //if (jointType0 == JointType.Head)
-            //{
-            //    robotDisplayWindow.UpdateTargetPosition(joint0.Position);
-            //}
         }
-
-        /// <summary>
-        /// Handles the checking or unchecking of the seated mode combo box
-        /// </summary>
-        /// <param name="sender">object sending the event</param>
-        /// <param name="e">event arguments</param>
-        //private void CheckBoxSeatedModeChanged(object sender, RoutedEventArgs e)
-        //{
-        //    if (null != this.sensor)
-        //    {
-        //        if (this.checkBoxSeatedMode.IsChecked.GetValueOrDefault())
-        //        {
-        //            this.sensor.SkeletonStream.TrackingMode = SkeletonTrackingMode.Seated;
-        //        }
-        //        else
-        //        {
-        //            this.sensor.SkeletonStream.TrackingMode = SkeletonTrackingMode.Default;
-        //        }
-        //    }
-        //}
     }
 }

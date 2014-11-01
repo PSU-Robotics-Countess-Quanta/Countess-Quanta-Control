@@ -37,15 +37,27 @@ namespace CountessQuantaControl
         }
 
         static Queue<LogEntry> logQueue = new Queue<LogEntry>();
-        static LoggingLevel loggingLevel = LoggingLevel.Info;
+        static LoggingLevel loggingDisplayLevel = LoggingLevel.Info;
         static long logCountLimit = 100;
         static bool newLogMessageAvailable = false;
         static Object messageLock = new Object();
+        static Object loggingDisplayLevelLock = new Object();
 
         // Check if the message severity is within the selected level.
         private static bool IsWithinLevel(LoggingLevel testLevel)
         {
-            return (testLevel <= loggingLevel);
+            lock (loggingDisplayLevelLock)
+            {
+                return (testLevel <= loggingDisplayLevel);
+            }
+        }
+
+        public static void SetLoggingDisplayLevel(LoggingLevel loggingLevel)
+        {
+            lock (loggingDisplayLevelLock)
+            {
+                loggingDisplayLevel = loggingLevel;
+            }
         }
 
         // Check if a new message has been added to the log since it 

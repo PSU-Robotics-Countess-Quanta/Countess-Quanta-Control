@@ -11,28 +11,45 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Microsoft.Kinect;
-using System.Speech.Synthesis;
 
 namespace CountessQuantaControl
 {
     public class SequenceProcessor
     {
         ServoManager servoManager;
+        AriaManager ariaManager;
+        RobotSpeech robotSpeech;
+        RobotEyes robotEyes;
         SequenceList sequenceList;
         Object sequenceLock = new Object();
         bool sequenceIsRunning = false;
         Sequence runningSequence;
-        SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
 
-        public SequenceProcessor(ServoManager servoManager, string sequenceFileName)
+        public SequenceProcessor(ServoManager servoManager, AriaManager ariaManager, RobotSpeech robotSpeech, RobotEyes robotEyes, string sequenceFileName)
         {
             this.servoManager = servoManager;
+            this.ariaManager = ariaManager;
+            this.robotSpeech = robotSpeech;
+            this.robotEyes = robotEyes;
             sequenceList = new SequenceList(sequenceFileName);
         }
 
         public void LoadSequenceFile(string fileName)
         {
             sequenceList.LoadFromXml(fileName);
+        }
+
+        public List<string> GetSequenceList()
+        {
+            List<Sequence> listOfSequences = sequenceList.GetSequences();
+            List<string> listOfSequenceNames = new List<string>();
+
+            foreach (Sequence sequence in listOfSequences)
+            {
+                listOfSequenceNames.Add(sequence.name);
+            }
+
+            return listOfSequenceNames;
         }
 
         // Starts running the selected sequence in a new thread. Fails if another sequence 
@@ -61,10 +78,23 @@ namespace CountessQuantaControl
             }
 
             runningSequence = sequence;
-            Thread oThread = new Thread(new ThreadStart(RunSequenceThread));
+            Thread newThread = new Thread(new ThreadStart(RunSequenceThread));
 
             // Start the thread
-            oThread.Start();
+            newThread.Start();
+        }
+
+        // This class is used to pass frame and event objects to the servo and wheel motion threads.
+        private class SequenceThreadData
+        {
+            public Frame frame;
+            public ManualResetEvent resetEvent;
+
+            public SequenceThreadData(Frame frame, ManualResetEvent resetEvent)
+            {
+                this.frame = frame;
+                this.resetEvent = resetEvent;
+            }
         }
 
         // Performs the sequence by stepping through each frame and executing the required 
@@ -73,13 +103,15 @@ namespace CountessQuantaControl
         {
             if (!servoManager.IsConnected())
             {
-                ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Warning, "Servo hardware is disconnected, running sequence '" + runningSequence.name + "' in simulation mode.");
+                ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Warning, "Servo hardware is disconnected, running servos in simulation mode for sequence '" + runningSequence.name + "'.");
             }
 
-            // Disable the person tracking feature while a sequence is executing.
-            servoManager.PersonTrackingEnable(false);
+            if (!ariaManager.IsConnected())
+            {
+                ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Warning, "Robot base hardware is disconnected, running robot base in simulation mode for sequence '" + runningSequence.name + "'.");
+            }
 
-            ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Info, "RunSequence(): sequence '" + runningSequence.name + "' started.");
+            ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Info, "RunSequenceThread(): sequence '" + runningSequence.name + "' started.");
 
             foreach (Frame frame in runningSequence.GetFrames())
             {
@@ -87,7 +119,27 @@ namespace CountessQuantaControl
                 // perform moves in this and subsequent frames.
                 if (frame.speechString != null)
                 {
-                    speechSynthesizer.SpeakAsync(frame.speechString);
+                    robotSpeech.Speak(frame.speechString);
+                }
+
+                // Set the state of the LED eyes.
+                if (frame.eyeState != null)
+                {
+                    switch (frame.eyeState)
+                    {
+                        case "Open":
+                            robotEyes.SetEyeState(true, true);
+                            break;
+                        case "Closed":
+                            robotEyes.SetEyeState(false, false);
+                            break;
+                        case "LeftClosed":
+                            robotEyes.SetEyeState(false, true);
+                            break;
+                        case "RightClosed":
+                            robotEyes.SetEyeState(true, false);
+                            break;
+                    }
                 }
 
                 // Wait for the specified amount of time.
@@ -96,17 +148,29 @@ namespace CountessQuantaControl
                     Thread.Sleep((int)(frame.delay * 1000));
                 }
 
-                // Move all servos in the frame list.
-                if (frame.GetServoPositions().Count > 0)
-                {
-                    servoManager.MoveServos(frame.GetServoPositions(), frame.timeToDestination);
-                }
+
+                // Servo motion and wheel motion are performed simultaneously by creating two separate threads and 
+                // waiting until both threads have completed their motion.
+
+                ManualResetEvent[] manualEvents = new ManualResetEvent[]
+                { 
+                    new ManualResetEvent(false), 
+                    new ManualResetEvent(false)
+                };
+
+                // Start servo motion thread.
+                Thread servoThread = new Thread(new ParameterizedThreadStart(MoveServos));
+                servoThread.Start(new SequenceThreadData(frame, manualEvents[0]));
+
+                // Start wheel motion thread.
+                Thread wheelsThread = new Thread(new ParameterizedThreadStart(MoveWheels));
+                wheelsThread.Start(new SequenceThreadData(frame, manualEvents[1]));
+
+                // Wait until both servo motion and wheel motion has completed.
+                WaitHandle.WaitAll(manualEvents);
             }
 
-            ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Info, "RunSequence(): sequence '" + runningSequence.name + "' completed.");
-
-            // Re-enable the person tracking feature.
-            servoManager.PersonTrackingEnable(true);
+            ErrorLogging.AddMessage(ErrorLogging.LoggingLevel.Info, "RunSequenceThread(): sequence '" + runningSequence.name + "' completed.");
 
             lock (sequenceLock)
             {
@@ -114,21 +178,40 @@ namespace CountessQuantaControl
             }
         }
 
-        public void PersonTrackingUpdate(SkeletonPoint targetPosition)
+        // Performs servo motions for the current frame, and triggers an event when motion is complete.
+        private void MoveServos(object sequenceThreadData)
         {
-            servoManager.PersonTrackingUpdate(targetPosition);
+            Frame frame = ((SequenceThreadData)sequenceThreadData).frame;
+
+            // Move all servos in the frame list.
+            if (frame.GetServoPositions().Count > 0)
+            {
+                servoManager.MoveServos(frame.GetServoPositions(), frame.timeToDestination);
+            }
+
+            // Signal that motion is complete.
+            ((SequenceThreadData)sequenceThreadData).resetEvent.Set();
         }
 
-        public event EventHandler<SpeakStartedEventArgs> SpeakStarted
+        // Performs wheel motions for the current frame, and triggers an event when motion is complete.
+        private void MoveWheels(object sequenceThreadData)
         {
-            add { speechSynthesizer.SpeakStarted += value; }
-            remove { speechSynthesizer.SpeakStarted -= value; }
+            Frame frame = ((SequenceThreadData)sequenceThreadData).frame;
+
+            // Move wheels on the robot base. Translation/rotation moves and individual wheel moves are mutually exclusive, 
+            // so we prioritize the translation/rotation moves and ignore individual wheel moves, if translation/rotation is specified.
+            if (frame.wheelMove.translation != 0 || frame.wheelMove.rotation != 0)
+            {
+                ariaManager.MoveBothWheels(frame.wheelMove.translation, frame.wheelMove.rotation, frame.timeToDestination);
+            }
+            else if (frame.wheelMove.leftWheel != 0 || frame.wheelMove.rightWheel != 0)
+            {
+                ariaManager.MoveEachWheel(frame.wheelMove.leftWheel, frame.wheelMove.rightWheel, frame.timeToDestination);
+            }
+
+            // Signal that motion is complete.
+            ((SequenceThreadData)sequenceThreadData).resetEvent.Set();
         }
 
-        public event EventHandler<SpeakCompletedEventArgs> SpeakCompleted
-        {
-            add { speechSynthesizer.SpeakCompleted += value; }
-            remove { speechSynthesizer.SpeakCompleted -= value; }
-        }
     }
 }
