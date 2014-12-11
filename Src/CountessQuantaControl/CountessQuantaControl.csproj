@@ -98,6 +98,11 @@
     <Compile Include="Decision.cs">
       <DependentUpon>RobotModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="DecisionActionEngine\Implementations\ParentActionObj.cs" />
+    <Compile Include="DecisionActionEngine\Implementations\ScreenActionObj.cs" />
+    <Compile Include="DecisionActionEngine\Implementations\ServoActionObj.cs" />
+    <Compile Include="DecisionActionEngine\Implementations\SpeechActionObj.cs" />
+    <Compile Include="DecisionActionEngine\Interfaces\IAction.cs" />
     <Compile Include="DecisionLog.cs">
       <DependentUpon>RobotModel.tt</DependentUpon>
     </Compile>
@@ -247,6 +252,10 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Hardware Modules\Implementations\" />
+    <Folder Include="Hardware Modules\Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SlowCheetahTargets)" Condition="Exists('$(SlowCheetahTargets)')" Label="SlowCheetah" />
