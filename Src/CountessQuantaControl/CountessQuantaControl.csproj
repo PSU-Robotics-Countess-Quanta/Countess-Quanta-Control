@@ -36,14 +36,29 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Label="SlowCheetah">
+    <SlowCheetahToolsPath>$([System.IO.Path]::GetFullPath( $(MSBuildProjectDirectory)\..\packages\SlowCheetah.2.5.14\tools\))</SlowCheetahToolsPath>
+    <SlowCheetah_EnableImportFromNuGet Condition=" '$(SlowCheetah_EnableImportFromNuGet)'=='' ">true</SlowCheetah_EnableImportFromNuGet>
+    <SlowCheetah_NuGetImportPath Condition=" '$(SlowCheetah_NuGetImportPath)'=='' ">$([System.IO.Path]::GetFullPath( $(MSBuildProjectDirectory)\Properties\SlowCheetah\SlowCheetah.Transforms.targets ))</SlowCheetah_NuGetImportPath>
+    <SlowCheetahTargets Condition=" '$(SlowCheetah_EnableImportFromNuGet)'=='true' and Exists('$(SlowCheetah_NuGetImportPath)') ">$(SlowCheetah_NuGetImportPath)</SlowCheetahTargets>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net40\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net40\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Kinect, Version=1.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Speech, Version=11.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\..\Windows\assembly\GAC_MSIL\Microsoft.Speech\11.0.0.0__31bf3856ad364e35\Microsoft.Speech.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Speech" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -70,16 +85,83 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Action.cs">
+      <DependentUpon>RobotModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ActionGroupType.cs">
+      <DependentUpon>RobotModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="AriaManager.cs" />
+    <Compile Include="ButtonOperator.cs">
+      <DependentUpon>RobotModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Decision.cs">
+      <DependentUpon>RobotModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DecisionLog.cs">
+      <DependentUpon>RobotModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="ErrorLogging.cs" />
+    <Compile Include="GestureOperator.cs">
+      <DependentUpon>RobotModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Operator.cs">
+      <DependentUpon>RobotModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="OperatorType.cs">
+      <DependentUpon>RobotModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Option.cs">
+      <DependentUpon>RobotModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="PersonTracking.cs" />
+    <Compile Include="RobotEntities.Debug.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RobotEntities.Debug.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="RobotEntities.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RobotEntities.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="RobotEntities.Release.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RobotEntities.Release.edmx</DependentUpon>
+    </Compile>
     <Compile Include="RobotEyes.cs" />
+    <Compile Include="RobotModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RobotModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="RobotModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RobotModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="RobotSpeech.cs" />
+    <Compile Include="ScreenAction.cs">
+      <DependentUpon>RobotModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="SequenceClasses.cs" />
     <Compile Include="SequenceProcessor.cs" />
+    <Compile Include="Servo.cs">
+      <DependentUpon>RobotModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ServoAction.cs">
+      <DependentUpon>RobotModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="ServoManager.cs" />
     <Compile Include="SkeletonViewer.xaml.cs">
       <DependentUpon>SkeletonViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SpeechAction.cs">
+      <DependentUpon>RobotModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SpeechOperator.cs">
+      <DependentUpon>RobotModel.tt</DependentUpon>
     </Compile>
     <Page Include="ControlWindow.xaml">
       <SubType>Designer</SubType>
@@ -117,18 +199,57 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <EntityDeploy Include="RobotEntities.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>RobotEntities.Designer.cs</LastGenOutput>
+      <TransformOnBuild>true</TransformOnBuild>
+    </EntityDeploy>
+    <None Include="Properties\SlowCheetah\SlowCheetah.Transforms.targets" />
+    <None Include="RobotEntities.Debug.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>RobotEntities.Debug.Designer.cs</LastGenOutput>
+      <DependentUpon>RobotEntities.edmx</DependentUpon>
+      <IsTransformFile>True</IsTransformFile>
+    </None>
+    <None Include="RobotEntities.edmx.diagram">
+      <DependentUpon>RobotEntities.edmx</DependentUpon>
+    </None>
+    <None Include="RobotEntities.Release.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>RobotEntities.Release.Designer.cs</LastGenOutput>
+      <DependentUpon>RobotEntities.edmx</DependentUpon>
+      <IsTransformFile>True</IsTransformFile>
+    </None>
+    <None Include="RobotModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>RobotModel.Context.cs</LastGenOutput>
+      <DependentUpon>RobotEntities.edmx</DependentUpon>
+    </None>
+    <None Include="RobotModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>RobotModel.cs</LastGenOutput>
+      <DependentUpon>RobotEntities.edmx</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="SpeechGrammar.xml">
       <SubType>Designer</SubType>
     </Resource>
   </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SlowCheetahTargets)" Condition="Exists('$(SlowCheetahTargets)')" Label="SlowCheetah" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

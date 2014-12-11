@@ -1,0 +1,431 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl" Namespace="RobotEntities.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2005">
+        <EntityContainer Name="RobotEntitiesTargetContainer" >
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="RobotEntities" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
+        <EntityContainer Name="RobotEntitiesContainer" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="ActionGroupTypes" EntityType="RobotEntities.ActionGroupType" />
+          <EntitySet Name="ScreenActions" EntityType="RobotEntities.ScreenAction" />
+          <EntitySet Name="Operators" EntityType="RobotEntities.Operator" />
+          <EntitySet Name="Servoes" EntityType="RobotEntities.Servo" />
+          <EntitySet Name="Actions" EntityType="RobotEntities.Action" />
+          <EntitySet Name="OperatorTypes" EntityType="RobotEntities.OperatorType" />
+          <EntitySet Name="SpeechActions" EntityType="RobotEntities.SpeechAction" />
+          <EntitySet Name="DecisionLogs" EntityType="RobotEntities.DecisionLog" />
+          <EntitySet Name="GestureOperators" EntityType="RobotEntities.GestureOperator" />
+          <EntitySet Name="Options" EntityType="RobotEntities.Option" />
+          <EntitySet Name="ServoActions" EntityType="RobotEntities.ServoAction" />
+          <EntitySet Name="SpeechOperators" EntityType="RobotEntities.SpeechOperator" />
+          <EntitySet Name="Decisions" EntityType="RobotEntities.Decision" />
+          <EntitySet Name="ButtonOperators" EntityType="RobotEntities.ButtonOperator" />
+          <AssociationSet Name="ActionGroupTypeAction" Association="RobotEntities.ActionGroupTypeAction">
+            <End Role="ActionGroupType" EntitySet="ActionGroupTypes" />
+            <End Role="Action" EntitySet="Actions" />
+          </AssociationSet>
+          <AssociationSet Name="ActionSpeechAction" Association="RobotEntities.ActionSpeechAction">
+            <End Role="Action" EntitySet="Actions" />
+            <End Role="SpeechAction" EntitySet="SpeechActions" />
+          </AssociationSet>
+          <AssociationSet Name="ServoServoAction" Association="RobotEntities.ServoServoAction">
+            <End Role="Servo" EntitySet="Servoes" />
+            <End Role="ServoAction" EntitySet="ServoActions" />
+          </AssociationSet>
+          <AssociationSet Name="ActionScreenAction" Association="RobotEntities.ActionScreenAction">
+            <End Role="Action" EntitySet="Actions" />
+            <End Role="ScreenAction" EntitySet="ScreenActions" />
+          </AssociationSet>
+          <AssociationSet Name="ServoActionAction" Association="RobotEntities.ServoActionAction">
+            <End Role="ServoAction" EntitySet="ServoActions" />
+            <End Role="Action" EntitySet="Actions" />
+          </AssociationSet>
+          <AssociationSet Name="DecisionOption" Association="RobotEntities.DecisionOption">
+            <End Role="Decision" EntitySet="Decisions" />
+            <End Role="Option" EntitySet="Options" />
+          </AssociationSet>
+          <AssociationSet Name="DecisionDecisionLog" Association="RobotEntities.DecisionDecisionLog">
+            <End Role="Decision" EntitySet="Decisions" />
+            <End Role="DecisionLog" EntitySet="DecisionLogs" />
+          </AssociationSet>
+          <AssociationSet Name="ActionOption" Association="RobotEntities.ActionOption">
+            <End Role="Action" EntitySet="Actions" />
+            <End Role="Option" EntitySet="Options" />
+          </AssociationSet>
+          <AssociationSet Name="OperatorOperatorType" Association="RobotEntities.OperatorOperatorType">
+            <End Role="Operator" EntitySet="Operators" />
+            <End Role="OperatorType" EntitySet="OperatorTypes" />
+          </AssociationSet>
+          <AssociationSet Name="OptionOperator" Association="RobotEntities.OptionOperator">
+            <End Role="Option" EntitySet="Options" />
+            <End Role="Operator" EntitySet="Operators" />
+          </AssociationSet>
+          <AssociationSet Name="OperatorButtonOperator" Association="RobotEntities.OperatorButtonOperator">
+            <End Role="Operator" EntitySet="Operators" />
+            <End Role="ButtonOperator" EntitySet="ButtonOperators" />
+          </AssociationSet>
+          <AssociationSet Name="OperatorSpeechOperator" Association="RobotEntities.OperatorSpeechOperator">
+            <End Role="Operator" EntitySet="Operators" />
+            <End Role="SpeechOperator" EntitySet="SpeechOperators" />
+          </AssociationSet>
+          <AssociationSet Name="OperatorGestureOperator" Association="RobotEntities.OperatorGestureOperator">
+            <End Role="Operator" EntitySet="Operators" />
+            <End Role="GestureOperator" EntitySet="GestureOperators" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="ActionGroupType">
+          <Key>
+            <PropertyRef Name="ActionGroupTypeID" />
+          </Key>
+          <Property Name="ActionGroupTypeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ActionGroupName" Type="String" Nullable="false" />
+          <NavigationProperty Name="Actions" Relationship="RobotEntities.ActionGroupTypeAction" FromRole="ActionGroupType" ToRole="Action" />
+        </EntityType>
+        <EntityType Name="ScreenAction">
+          <Key>
+            <PropertyRef Name="ScreenActionID" />
+          </Key>
+          <Property Name="ScreenActionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ButtonName" Type="String" Nullable="false" />
+          <Property Name="ButtonDesc" Type="String" Nullable="false" />
+          <Property Name="ButtonPic" Type="Binary" Nullable="false" />
+          <NavigationProperty Name="Action" Relationship="RobotEntities.ActionScreenAction" FromRole="ScreenAction" ToRole="Action" />
+          <Property Name="ActionID" Type="Int32" Nullable="true" />
+        </EntityType>
+        <EntityType Name="Operator">
+          <Key>
+            <PropertyRef Name="OperatorID" />
+          </Key>
+          <Property Name="OperatorID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ParentOperatorID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="OperatorType" Relationship="RobotEntities.OperatorOperatorType" FromRole="Operator" ToRole="OperatorType" />
+          <Property Name="OperatorTypeID" Type="Int32" Nullable="true" />
+          <NavigationProperty Name="Option" Relationship="RobotEntities.OptionOperator" FromRole="Operator" ToRole="Option" />
+          <Property Name="OptionID" Type="Int32" Nullable="true" />
+          <NavigationProperty Name="ButtonOperators" Relationship="RobotEntities.OperatorButtonOperator" FromRole="Operator" ToRole="ButtonOperator" />
+          <NavigationProperty Name="SpeechOperators" Relationship="RobotEntities.OperatorSpeechOperator" FromRole="Operator" ToRole="SpeechOperator" />
+          <NavigationProperty Name="GestureOperators" Relationship="RobotEntities.OperatorGestureOperator" FromRole="Operator" ToRole="GestureOperator" />
+          <Property Name="Weight" Type="Decimal" Nullable="false" />
+          <Property Name="LogicGate" Type="String" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Servo">
+          <Key>
+            <PropertyRef Name="ServoID" />
+          </Key>
+          <Property Name="ServoID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ServoName" Type="String" Nullable="false" />
+          <Property Name="ServoIndex" Type="Int32" Nullable="false" />
+          <Property Name="PosLimitMax" Type="Decimal" Nullable="false" />
+          <Property Name="PosLimitMin" Type="Decimal" Nullable="false" />
+          <Property Name="SpeedLimMax" Type="Decimal" Nullable="false" />
+          <Property Name="SpeedLimMin" Type="Decimal" Nullable="false" />
+          <Property Name="DefaultPos" Type="Decimal" Nullable="false" />
+          <Property Name="DefaultSpeed" Type="Decimal" Nullable="false" />
+          <Property Name="DefaultAcceleration" Type="Decimal" Nullable="false" />
+          <NavigationProperty Name="ServoActions" Relationship="RobotEntities.ServoServoAction" FromRole="Servo" ToRole="ServoAction" />
+        </EntityType>
+        <EntityType Name="Action">
+          <Key>
+            <PropertyRef Name="ActionID" />
+          </Key>
+          <Property Name="ActionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ActionName" Type="String" Nullable="false" />
+          <Property Name="IsParallel" Type="Boolean" Nullable="false" />
+          <Property Name="TimeOffsetSec" Type="Boolean" Nullable="false" />
+          <Property Name="SequenceNo" Type="Int32" Nullable="false" />
+          <Property Name="ParentActionID" Type="String" Nullable="false" />
+          <Property Name="Enabled" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="ActionGroupType" Relationship="RobotEntities.ActionGroupTypeAction" FromRole="Action" ToRole="ActionGroupType" />
+          <Property Name="ActionGroupTypeID" Type="Int32" Nullable="true" />
+          <NavigationProperty Name="SpeechActions" Relationship="RobotEntities.ActionSpeechAction" FromRole="Action" ToRole="SpeechAction" />
+          <NavigationProperty Name="ScreenActions" Relationship="RobotEntities.ActionScreenAction" FromRole="Action" ToRole="ScreenAction" />
+          <NavigationProperty Name="ServoActions" Relationship="RobotEntities.ServoActionAction" FromRole="Action" ToRole="ServoAction" />
+          <NavigationProperty Name="Options" Relationship="RobotEntities.ActionOption" FromRole="Action" ToRole="Option" />
+        </EntityType>
+        <EntityType Name="OperatorType">
+          <Key>
+            <PropertyRef Name="OperatorTypeID" />
+          </Key>
+          <Property Name="OperatorTypeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="OperatorTypeName" Type="String" Nullable="false" />
+          <NavigationProperty Name="Operators" Relationship="RobotEntities.OperatorOperatorType" FromRole="OperatorType" ToRole="Operator" />
+        </EntityType>
+        <EntityType Name="SpeechAction">
+          <Key>
+            <PropertyRef Name="SpeechActionID" />
+          </Key>
+          <Property Name="SpeechActionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Phrase" Type="String" Nullable="false" />
+          <Property Name="Weight" Type="Decimal" Nullable="false" />
+          <NavigationProperty Name="Action" Relationship="RobotEntities.ActionSpeechAction" FromRole="SpeechAction" ToRole="Action" />
+          <Property Name="ActionID" Type="Int32" Nullable="true" />
+        </EntityType>
+        <EntityType Name="DecisionLog">
+          <Key>
+            <PropertyRef Name="DecisionLogID" />
+          </Key>
+          <Property Name="DecisionLogID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DecisionTimestamp" Type="DateTime" Nullable="false" />
+          <Property Name="SelectedOptionID" Type="Int32" Nullable="false" />
+          <Property Name="FinalWeight" Type="Decimal" Nullable="false" />
+          <NavigationProperty Name="Decision" Relationship="RobotEntities.DecisionDecisionLog" FromRole="DecisionLog" ToRole="Decision" />
+          <Property Name="DecisionID" Type="Int32" Nullable="true" />
+        </EntityType>
+        <EntityType Name="GestureOperator">
+          <Key>
+            <PropertyRef Name="GestureOperatorID" />
+          </Key>
+          <Property Name="GestureOperatorID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GestureName" Type="String" Nullable="false" />
+          <NavigationProperty Name="Operator" Relationship="RobotEntities.OperatorGestureOperator" FromRole="GestureOperator" ToRole="Operator" />
+          <Property Name="OperatorID" Type="Int32" Nullable="true" />
+        </EntityType>
+        <EntityType Name="Option">
+          <Key>
+            <PropertyRef Name="OptionID" />
+          </Key>
+          <Property Name="OptionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="OptionName" Type="String" Nullable="false" />
+          <Property Name="Weight" Type="Decimal" Nullable="false" />
+          <Property Name="NextDecisionID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Decision" Relationship="RobotEntities.DecisionOption" FromRole="Option" ToRole="Decision" />
+          <Property Name="DecisionID" Type="Int32" Nullable="true" />
+          <NavigationProperty Name="Action" Relationship="RobotEntities.ActionOption" FromRole="Option" ToRole="Action" />
+          <Property Name="ActionID" Type="Int32" Nullable="true" />
+          <NavigationProperty Name="Operators" Relationship="RobotEntities.OptionOperator" FromRole="Option" ToRole="Operator" />
+        </EntityType>
+        <EntityType Name="ServoAction">
+          <Key>
+            <PropertyRef Name="ServoActionID" />
+          </Key>
+          <Property Name="ServoActionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Acceleration" Type="Int32" Nullable="false" />
+          <Property Name="DurationSec" Type="Decimal" Nullable="false" />
+          <Property Name="Position" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Servo" Relationship="RobotEntities.ServoServoAction" FromRole="ServoAction" ToRole="Servo" />
+          <Property Name="ServoID" Type="Int32" Nullable="true" />
+          <NavigationProperty Name="Action" Relationship="RobotEntities.ServoActionAction" FromRole="ServoAction" ToRole="Action" />
+          <Property Name="ActionID" Type="Int32" Nullable="true" />
+        </EntityType>
+        <EntityType Name="SpeechOperator">
+          <Key>
+            <PropertyRef Name="SpeechOperatorID" />
+          </Key>
+          <Property Name="SpeechOperatorID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PhraseToMonitor" Type="String" Nullable="false" />
+          <NavigationProperty Name="Operator" Relationship="RobotEntities.OperatorSpeechOperator" FromRole="SpeechOperator" ToRole="Operator" />
+          <Property Name="OperatorID" Type="Int32" Nullable="true" />
+        </EntityType>
+        <EntityType Name="Decision">
+          <Key>
+            <PropertyRef Name="DecisionID" />
+          </Key>
+          <Property Name="DecisionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DecisionName" Type="String" Nullable="false" />
+          <Property Name="Enabled" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Options" Relationship="RobotEntities.DecisionOption" FromRole="Decision" ToRole="Option" />
+          <NavigationProperty Name="DecisionLogs" Relationship="RobotEntities.DecisionDecisionLog" FromRole="Decision" ToRole="DecisionLog" />
+        </EntityType>
+        <EntityType Name="ButtonOperator">
+          <Key>
+            <PropertyRef Name="ButtonOperatorID" />
+          </Key>
+          <Property Name="ButtonOperatorID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ButtonName" Type="String" Nullable="false" />
+          <NavigationProperty Name="Operator" Relationship="RobotEntities.OperatorButtonOperator" FromRole="ButtonOperator" ToRole="Operator" />
+          <Property Name="OperatorID" Type="Int32" Nullable="true" />
+        </EntityType>
+        <Association Name="ActionGroupTypeAction">
+          <End Type="RobotEntities.ActionGroupType" Role="ActionGroupType" Multiplicity="0..1" />
+          <End Type="RobotEntities.Action" Role="Action" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ActionGroupType">
+              <PropertyRef Name="ActionGroupTypeID" />
+            </Principal>
+            <Dependent Role="Action">
+              <PropertyRef Name="ActionGroupTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ActionSpeechAction">
+          <End Type="RobotEntities.Action" Role="Action" Multiplicity="0..1" />
+          <End Type="RobotEntities.SpeechAction" Role="SpeechAction" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Action">
+              <PropertyRef Name="ActionID" />
+            </Principal>
+            <Dependent Role="SpeechAction">
+              <PropertyRef Name="ActionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ServoServoAction">
+          <End Type="RobotEntities.Servo" Role="Servo" Multiplicity="0..1" />
+          <End Type="RobotEntities.ServoAction" Role="ServoAction" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Servo">
+              <PropertyRef Name="ServoID" />
+            </Principal>
+            <Dependent Role="ServoAction">
+              <PropertyRef Name="ServoID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ActionScreenAction">
+          <End Type="RobotEntities.Action" Role="Action" Multiplicity="0..1" />
+          <End Type="RobotEntities.ScreenAction" Role="ScreenAction" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Action">
+              <PropertyRef Name="ActionID" />
+            </Principal>
+            <Dependent Role="ScreenAction">
+              <PropertyRef Name="ActionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ServoActionAction">
+          <End Type="RobotEntities.ServoAction" Role="ServoAction" Multiplicity="*" />
+          <End Type="RobotEntities.Action" Role="Action" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Action">
+              <PropertyRef Name="ActionID" />
+            </Principal>
+            <Dependent Role="ServoAction">
+              <PropertyRef Name="ActionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="DecisionOption">
+          <End Type="RobotEntities.Decision" Role="Decision" Multiplicity="0..1" />
+          <End Type="RobotEntities.Option" Role="Option" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Decision">
+              <PropertyRef Name="DecisionID" />
+            </Principal>
+            <Dependent Role="Option">
+              <PropertyRef Name="DecisionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="DecisionDecisionLog">
+          <End Type="RobotEntities.Decision" Role="Decision" Multiplicity="0..1" />
+          <End Type="RobotEntities.DecisionLog" Role="DecisionLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Decision">
+              <PropertyRef Name="DecisionID" />
+            </Principal>
+            <Dependent Role="DecisionLog">
+              <PropertyRef Name="DecisionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ActionOption">
+          <End Type="RobotEntities.Action" Role="Action" Multiplicity="0..1" />
+          <End Type="RobotEntities.Option" Role="Option" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Action">
+              <PropertyRef Name="ActionID" />
+            </Principal>
+            <Dependent Role="Option">
+              <PropertyRef Name="ActionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="OperatorOperatorType">
+          <End Type="RobotEntities.Operator" Role="Operator" Multiplicity="*" />
+          <End Type="RobotEntities.OperatorType" Role="OperatorType" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="OperatorType">
+              <PropertyRef Name="OperatorTypeID" />
+            </Principal>
+            <Dependent Role="Operator">
+              <PropertyRef Name="OperatorTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="OptionOperator">
+          <End Type="RobotEntities.Option" Role="Option" Multiplicity="0..1" />
+          <End Type="RobotEntities.Operator" Role="Operator" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Option">
+              <PropertyRef Name="OptionID" />
+            </Principal>
+            <Dependent Role="Operator">
+              <PropertyRef Name="OptionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="OperatorButtonOperator">
+          <End Type="RobotEntities.Operator" Role="Operator" Multiplicity="0..1" />
+          <End Type="RobotEntities.ButtonOperator" Role="ButtonOperator" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Operator">
+              <PropertyRef Name="OperatorID" />
+            </Principal>
+            <Dependent Role="ButtonOperator">
+              <PropertyRef Name="OperatorID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="OperatorSpeechOperator">
+          <End Type="RobotEntities.Operator" Role="Operator" Multiplicity="0..1" />
+          <End Type="RobotEntities.SpeechOperator" Role="SpeechOperator" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Operator">
+              <PropertyRef Name="OperatorID" />
+            </Principal>
+            <Dependent Role="SpeechOperator">
+              <PropertyRef Name="OperatorID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="OperatorGestureOperator">
+          <End Type="RobotEntities.Operator" Role="Operator" Multiplicity="0..1" />
+          <End Type="RobotEntities.GestureOperator" Role="GestureOperator" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Operator">
+              <PropertyRef Name="OperatorID" />
+            </Principal>
+            <Dependent Role="GestureOperator">
+              <PropertyRef Name="OperatorID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs" Space="C-S">
+        <Alias Key="Model" Value="RobotEntities" />
+        <Alias Key="Target" Value="RobotEntities.Store" />
+        <EntityContainerMapping CdmEntityContainer="RobotEntitiesContainer" StorageEntityContainer="RobotEntitiesTargetContainer">
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
