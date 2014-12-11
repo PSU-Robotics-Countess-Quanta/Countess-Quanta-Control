@@ -12,5 +12,7 @@ namespace CountessQuantaControl.DecisionActionEngine.Interfaces
         bool IsParallel { get; set; }
 
         void ExecuteAction();
+
+
     }
 }
